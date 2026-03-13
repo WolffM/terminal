@@ -412,9 +412,27 @@ namespace winrt::TerminalApp::implementation
                 co_return;
             }
         }
+        else
+        {
+            const auto t = winrt::get_self<implementation::Tab>(tab);
+            if (t->GetLeafPaneCount() > 1)
+            {
+                const auto weak = get_weak();
 
-        auto t = winrt::get_self<implementation::Tab>(tab);
-        auto actions = t->BuildStartupActions(BuildStartupKind::None);
+                auto warningResult = co_await _ShowCloseTabWarningDialog();
+
+                strong = weak.get();
+
+                // If the user didn't explicitly click on close tab - leave
+                if (!strong || warningResult != ContentDialogResult::Primary)
+                {
+                    co_return;
+                }
+            }
+        }
+
+        auto tabImpl = winrt::get_self<implementation::Tab>(tab);
+        auto actions = tabImpl->BuildStartupActions(BuildStartupKind::None);
         _AddPreviouslyClosedPaneOrTab(std::move(actions));
 
         tab.Close();
