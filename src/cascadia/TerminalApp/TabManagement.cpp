@@ -414,7 +414,7 @@ namespace winrt::TerminalApp::implementation
         }
 
         auto t = winrt::get_self<implementation::Tab>(tab);
-        if (t->GetLeafPaneCount() > 1)
+        if (t->GetLeafPaneCount() > 1 && _settings.GlobalSettings().ConfirmCloseAllPanes())
         {
             const auto weak = get_weak();
 
